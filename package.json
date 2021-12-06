@@ -1,5 +1,5 @@
 {
-  "name": "react-typescript-library-template",
+  "name": "calendar-blocks",
   "version": "1.0.0",
   "description": "",
   "files": [
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/a-type/react-typescript-library-template.git"
+    "url": "git+https://github.com/a-type/calendar-blocks.git"
   },
   "keywords": [],
   "author": {
@@ -34,35 +34,35 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/a-type/react-typescript-library-template/issues"
+    "url": "https://github.com/a-type/calendar-blocks/issues"
   },
-  "homepage": "https://github.com/a-type/react-typescript-library-template#readme",
+  "homepage": "https://github.com/a-type/calendar-blocks#readme",
   "peerDependencies": {
     "react": "*"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.5",
-    "@babel/preset-env": "^7.10.4",
-    "@babel/preset-react": "^7.10.4",
-    "@babel/preset-typescript": "^7.10.4",
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-react": "^7.16.0",
+    "@babel/preset-typescript": "^7.16.0",
+    "@stitches/react": "^1.2.6",
     "@storybook/addon-actions": "^5.3.19",
     "@storybook/addon-links": "^5.3.19",
     "@storybook/addons": "^5.3.19",
     "@storybook/preset-typescript": "^3.0.0",
     "@storybook/react": "^5.3.19",
-    "@testing-library/jest-dom": "^5.11.1",
-    "@testing-library/react": "^10.4.7",
-    "@types/jest": "^26.0.5",
-    "@types/node": "^14.0.23",
-    "@types/react": "^16.9.43",
-    "@types/react-dom": "^16.9.8",
-    "babel-loader": "^8.1.0",
-    "jest": "^26.1.0",
-    "prettier": "^2.0.5",
-    "react": "^16.13.1",
-    "typedoc": "0.17.0-3",
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/react": "^12.1.2",
+    "@types/jest": "^27.0.3",
+    "@types/node": "^16.11.11",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
+    "babel-loader": "^8.2.3",
+    "jest": "^27.4.3",
+    "prettier": "^2.5.1",
+    "react": "^17.0.2",
+    "typedoc": "0.22.10",
     "typedoc-plugin-internal-external": "^2.2.0",
-    "typescript": "^3.9.7"
-  },
-  "dependencies": {}
+    "typescript": "^4.5.2"
+  }
 }

@@ -13,7 +13,8 @@
     "resolveJsonModule": true,
     "jsx": "react",
     "noImplicitAny": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "skipLibCheck": true
   },
   "include": ["src"]
 }
