@@ -32,5 +32,3 @@ export const getMonthDayGrid = (month: number, year: number) => {
   }
   return days;
 };
-
-(window as any).g = getMonthDayGrid;
