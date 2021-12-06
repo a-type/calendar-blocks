@@ -22,7 +22,7 @@ export const getMonthDayGrid = (month: number, year: number) => {
 
   const dayOffset = getMonthWeekdayOffset(resolvedMonth, resolvedYear);
   // make a grid of days with 7 columns which is large enough to encompass the whole month
-  const days: Date[] = new Array(
+  const days: (Date | null)[] = new Array(
     Math.ceil((dayOffset + getDaysInMonth(resolvedMonth, resolvedYear)) / 7) * 7
   ).fill(null);
   while (date.getMonth() === resolvedMonth) {

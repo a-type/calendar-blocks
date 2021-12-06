@@ -95,8 +95,11 @@ const useDayProps = (value: Date) => {
 };
 
 /**
- * Renders a single day in a CalendarDayGrid. The proper rendering of a single CalendarDay
- * must be coordinated within the larger CalendarDayGrid component.
+ * Renders a single day in a calendar. The proper rendering of a day depends on the presence
+ * of a wrapping Calendar component. This component renders an unstyled <button> with a
+ * variety of attributes you can use to style the day. It automatically reports interactions
+ * to the parent Calendar context; there's no need to add your own event handlers to achieve
+ * functionality.
  * @public
  */
 export const CalendarDay = forwardRef<any, CalendarDayProps>(

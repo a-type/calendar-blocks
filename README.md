@@ -83,3 +83,9 @@ Here's a list:
 - `data-range-end`: If this day is the end of a range selection
 - `data-in-range`: If this day is in the range selection but not the start or end
 - `data-weekend`: If this day is a weekend
+
+## TODO
+
+- [ ] Better docs
+- [ ] Internationalization
+- [ ] Helpers for rendering days which fall outside the current month

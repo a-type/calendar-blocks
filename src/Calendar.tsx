@@ -4,22 +4,6 @@ import { CalendarContextData, CalendarContextProvider } from './CalendarContext'
 import { defaultGetDateEnabled, today } from './dateUtils';
 import useCalendarSelection from './useCalendarSelection';
 
-export type CalendarRenderProps = {
-  onDayClick: (ev: MouseEvent<any>, value: Date) => void;
-  setDay: (value: Date) => void;
-  setDayHovered: (value: Date) => void;
-  onDayHover: (ev: MouseEvent<any>, value: Date) => void;
-  highlightedDate: Date | null;
-  month: number;
-  year: number;
-  value?: Date | null;
-  rangeValue?: {
-    start: Date | null;
-    end: Date | null;
-  };
-  getDateEnabled: (value: Date) => boolean;
-};
-
 export type CalendarProps = Omit<
   HTMLAttributes<HTMLDivElement>,
   'value' | 'onChange'
@@ -74,10 +58,9 @@ export type CalendarProps = Omit<
 };
 
 /**
- * An all-purpose Calendar primitive which manages day selection, rendering the right
- * days for a given month, and various useful event callbacks. Rendering is fully
- * overrideable, allowing you to create your own visual implementation of the
- * final Calendar view. The default will use CalendarDayGrid.
+ * An all-purpose Calendar primitive which manages day selection and various useful event callbacks.
+ * Rendering is up to you; this component doesn't render any days or interactive elements - just a div
+ * to help track focus within the component.
  * @public
  */
 export const Calendar = forwardRef<any, CalendarProps>(

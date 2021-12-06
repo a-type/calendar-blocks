@@ -2,7 +2,8 @@ name: Homepage
 
 on:
   push:
-    branches: master
+    branches:
+    - main
 
 jobs:
   build:
