@@ -4,7 +4,11 @@ import { getGridDayCount, getMonthWeekdayOffset } from './dateUtils';
  * Expands a month into a grid of days, filling in days from previous
  * or next month as necessary.
  */
-export const getMonthDayGrid = (month: number, year: number) => {
+export const getMonthDayList = (
+  month: number,
+  year: number,
+  weekStartsOn: number
+) => {
   const date = new Date(year, month, 1);
 
   // first, since we accept any number for month, we grab and store the 'resolved'
@@ -13,9 +17,13 @@ export const getMonthDayGrid = (month: number, year: number) => {
   const resolvedMonth = date.getMonth();
   const resolvedYear = date.getFullYear();
 
-  const dayOffset = getMonthWeekdayOffset(resolvedMonth, resolvedYear);
+  const dayOffset = getMonthWeekdayOffset(
+    resolvedMonth,
+    resolvedYear,
+    weekStartsOn
+  );
   // make a grid of days with 7 columns which is large enough to encompass the whole month
-  return new Array(getGridDayCount(resolvedMonth, resolvedYear))
+  return new Array(getGridDayCount(resolvedMonth, resolvedYear, weekStartsOn))
     .fill(null)
     .map((_, i) => {
       const day = i - dayOffset + 1;

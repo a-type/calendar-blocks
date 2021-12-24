@@ -85,18 +85,31 @@ today.setMilliseconds(0);
  * from the first column if it falls on a day which isn't the first
  * of the week. This computes that offset for a given calendar month.
  */
-export function getMonthWeekdayOffset(month: number, year: number) {
+export function getMonthWeekdayOffset(
+  month: number,
+  year: number,
+  weekStartsOn: number
+): number {
   const firstDay = new Date(year, month, 1);
-  return firstDay.getDay();
+  // must be positive
+  const offset = firstDay.getDay() - weekStartsOn;
+  if (offset < 0) return offset + 7;
+  return offset;
 }
 
 /**
  * Computes the total number of grid rows required to display all
  * the days in a calendar month.
  */
-export function getGridRowCount(month: number, year: number) {
+export function getGridRowCount(
+  month: number,
+  year: number,
+  weekStartsOn: number
+) {
   return Math.ceil(
-    (getMonthWeekdayOffset(month, year) + getDaysInMonth(month, year)) / 7
+    (getMonthWeekdayOffset(month, year, weekStartsOn) +
+      getDaysInMonth(month, year)) /
+      7
   );
 }
 
@@ -106,18 +119,26 @@ export function getGridRowCount(month: number, year: number) {
  * for days which fall outside the current month but are visible
  * because of weekday offsets.
  */
-export function getGridDayCount(month: number, year: number) {
-  return getGridRowCount(month, year) * 7;
+export function getGridDayCount(
+  month: number,
+  year: number,
+  weekStartsOn: number
+) {
+  return getGridRowCount(month, year, weekStartsOn) * 7;
 }
 
 /**
  * Determines if a given date is on the first row of its respective
  * calendar grid as it would be rendered.
  */
-export function getIsFirstRow(date: Date) {
+export function getIsFirstRow(date: Date, weekStartsOn: number) {
   return (
     date.getDate() +
-      getMonthWeekdayOffset(date.getMonth(), date.getFullYear()) <=
+      getMonthWeekdayOffset(
+        date.getMonth(),
+        date.getFullYear(),
+        weekStartsOn
+      ) <=
     7
   );
 }
@@ -126,13 +147,14 @@ export function getIsFirstRow(date: Date) {
  * Determines if a given date is on the last row of its respective
  * calendar grid as it would be rendered.
  */
-export function getIsLastRow(date: Date) {
+export function getIsLastRow(date: Date, weekStartsOn: number) {
   // this is surprisingly hard to get right lol
 
   const daysInMonth = getDaysInMonth(date.getMonth(), date.getFullYear());
   const firstDayOffset = getMonthWeekdayOffset(
     date.getMonth(),
-    date.getFullYear()
+    date.getFullYear(),
+    weekStartsOn
   );
   const totalGridCells = Math.ceil((daysInMonth + firstDayOffset) / 7) * 7;
   const emptyDaysTotal = totalGridCells - daysInMonth;

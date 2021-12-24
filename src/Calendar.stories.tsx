@@ -1,9 +1,10 @@
 import { styled } from '@stitches/react';
 import React, { useCallback, useState } from 'react';
 
+import { CalendarDays } from '.';
 import { Calendar } from './Calendar';
 import { CalendarDay } from './CalendarDay';
-import { useCalendarDayGrid } from './useCalendarDayGrid';
+import { WeekDay } from './constants';
 
 export default {
   title: 'Calendar',
@@ -18,7 +19,6 @@ const StyledDay = styled(CalendarDay, {
   alignItems: 'center',
   justifyContent: 'center',
 
-  transition: '0.2s ease all',
   cursor: 'pointer',
 
   '&[data-selected]': {
@@ -45,7 +45,7 @@ const StyledDay = styled(CalendarDay, {
   },
 });
 
-const StyledGrid = styled('div', {
+const StyledGrid = styled(Calendar, {
   display: 'grid',
   gridGap: '4px',
   gridTemplateColumns: 'repeat(7, 32px)',
@@ -66,8 +66,6 @@ export const simple = () => {
     month: 'long',
     year: 'numeric',
   });
-
-  const days = useCalendarDayGrid(month, year);
 
   return (
     <div
@@ -91,19 +89,17 @@ export const simple = () => {
             &gt;
           </button>
         </div>
-        <Calendar
+        <StyledGrid
           displayMonth={month}
           displayYear={year}
           value={value}
           onChange={setValue}
           onDisplayChange={setViewInfo}
         >
-          <StyledGrid>
-            {days.map((value) => (
-              <StyledDay value={value} key={value.key} />
-            ))}
-          </StyledGrid>
-        </Calendar>
+          <CalendarDays>
+            {(value) => <StyledDay value={value} key={value.key} />}
+          </CalendarDays>
+        </StyledGrid>
       </div>
       <p>Selected date: {value?.toLocaleDateString() ?? 'none'}</p>
     </div>
@@ -128,8 +124,6 @@ export const range = () => {
     year: 'numeric',
   });
 
-  const days = useCalendarDayGrid(month, year);
-
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
@@ -149,19 +143,17 @@ export const range = () => {
             &gt;
           </button>
         </div>
-        <Calendar
+        <StyledGrid
           displayMonth={month}
           displayYear={year}
           onDisplayChange={setViewInfo}
           rangeValue={rangeValue}
           onRangeChange={setRangeValue}
         >
-          <StyledGrid>
-            {days.map((value) => (
-              <StyledDay value={value} key={value.key} />
-            ))}
-          </StyledGrid>
-        </Calendar>
+          <CalendarDays>
+            {(value) => <StyledDay value={value} key={value.key} />}
+          </CalendarDays>
+        </StyledGrid>
       </div>
       <p>
         Selected dates: {rangeValue.start?.toLocaleDateString()} -{' '}
@@ -186,8 +178,6 @@ export const dayLabels = () => {
     year: 'numeric',
   });
 
-  const days = useCalendarDayGrid(month, year);
-
   return (
     <div
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
@@ -211,36 +201,107 @@ export const dayLabels = () => {
             &gt;
           </button>
         </div>
-        <Calendar
+        <StyledGrid
           displayMonth={month}
           displayYear={year}
           value={value}
           onChange={setValue}
           onDisplayChange={setViewInfo}
         >
-          <StyledGrid>
-            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-                key={idx}
-              >
-                {day}
-              </div>
-            ))}
-            {days.map((value) => (
-              <StyledDay value={value} key={value.key} />
-            ))}
-          </StyledGrid>
-        </Calendar>
+          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, idx) => (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              key={idx}
+            >
+              {day}
+            </div>
+          ))}
+          <CalendarDays>
+            {(value) => <StyledDay value={value} key={value.key} />}
+          </CalendarDays>
+        </StyledGrid>
       </div>
       <p>Selected date: {value?.toLocaleDateString() ?? 'none'}</p>
     </div>
   );
 };
+
+export const weekStartsOnMonday = () => {
+  const [{ month, year }, setViewInfo] = useState<{
+    month: number;
+    year: number;
+  }>({
+    month: now.getMonth(),
+    year: now.getFullYear(),
+  });
+  const [value, setValue] = useState<Date | null>(null);
+
+  const monthLabel = new Date(year, month).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return (
+    <div
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'start' }}
+    >
+      <p>
+        You can supply a custom week start day index according to your locale
+      </p>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={() => setViewInfo((v) => ({ ...v, month: v.month - 1 }))}
+          >
+            &lt;
+          </button>
+          <span style={{ margin: '0 4px' }}>{monthLabel}</span>
+          <button
+            onClick={() => setViewInfo((v) => ({ ...v, month: v.month + 1 }))}
+          >
+            &gt;
+          </button>
+        </div>
+        <StyledGrid
+          displayMonth={month}
+          displayYear={year}
+          value={value}
+          onChange={setValue}
+          onDisplayChange={setViewInfo}
+          weekStartsOn={WeekDay.Monday}
+        >
+          {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day, idx) => (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              key={idx}
+            >
+              {day}
+            </div>
+          ))}
+          <CalendarDays>
+            {(value) => <StyledDay value={value} key={value.key} />}
+          </CalendarDays>
+        </StyledGrid>
+      </div>
+      <p>Selected date: {value?.toLocaleDateString() ?? 'none'}</p>
+    </div>
+  );
+};
+
+const SimpleGrid = styled('div', {
+  display: 'grid',
+  gridGap: '4px',
+  gridTemplateColumns: 'repeat(7, 32px)',
+  gridAutoRows: '32px',
+});
 
 export const wideRange = () => {
   const [{ month, year }, setViewInfo] = useState<{
@@ -292,9 +353,6 @@ export const wideRange = () => {
     year: 'numeric',
   });
 
-  const leftDays = useCalendarDayGrid(month, year);
-  const rightDays = useCalendarDayGrid(month + 1, year);
-
   return (
     <>
       <p>
@@ -321,11 +379,11 @@ export const wideRange = () => {
               </button>
               <span style={{ margin: '0 auto 0 auto' }}>{monthLabel}</span>
             </div>
-            <StyledGrid>
-              {leftDays.map((value) => (
-                <StyledDay value={value} key={value.key} />
-              ))}
-            </StyledGrid>
+            <SimpleGrid>
+              <CalendarDays>
+                {(value) => <StyledDay value={value} key={value.key} />}
+              </CalendarDays>
+            </SimpleGrid>
           </div>
           <div>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -338,11 +396,11 @@ export const wideRange = () => {
                 &gt;
               </button>
             </div>
-            <StyledGrid>
-              {rightDays.map((value) => (
-                <StyledDay value={value} key={value.key} />
-              ))}
-            </StyledGrid>
+            <SimpleGrid>
+              <CalendarDays monthOffset={1}>
+                {(value) => <StyledDay value={value} key={value.key} />}
+              </CalendarDays>
+            </SimpleGrid>
           </div>
         </div>
       </Calendar>
@@ -373,8 +431,6 @@ export const disabledDays = () => {
     );
   }, []);
 
-  const days = useCalendarDayGrid(month, year);
-
   return (
     <>
       <p>
@@ -382,7 +438,7 @@ export const disabledDays = () => {
       </p>
       <div>
         <span>{monthLabel}</span>
-        <Calendar
+        <StyledGrid
           displayMonth={month}
           displayYear={year}
           value={value}
@@ -390,12 +446,10 @@ export const disabledDays = () => {
           onDisplayChange={setViewInfo}
           getDateEnabled={getDateEnabled}
         >
-          <StyledGrid>
-            {days.map((value) => (
-              <StyledDay value={value} key={value.key} />
-            ))}
-          </StyledGrid>
-        </Calendar>
+          <CalendarDays>
+            {(value) => <StyledDay value={value} key={value.key} />}
+          </CalendarDays>
+        </StyledGrid>
       </div>
     </>
   );
@@ -405,7 +459,7 @@ export const disabledDays = () => {
  * Stylized examples
  */
 
-const StylizedGrid = styled(StyledGrid, {
+const StylizedGrid = styled(SimpleGrid, {
   gridGap: 0,
 });
 
@@ -419,6 +473,7 @@ const StylizedDay = styled(StyledDay, {
   marginBottom: -1,
   // keep above blank days
   position: 'relative',
+  transition: '0.2s ease all',
 
   '&[data-weekend]': {
     backgroundColor: '#fafaff',
@@ -451,10 +506,10 @@ const StylizedDay = styled(StyledDay, {
     boxShadow: '0 0 0 2px #ecce1f',
     zIndex: 1,
   },
-  '&[data-first-week]': {
+  '&[data-top-edge]': {
     borderTop: '1px solid #000',
   },
-  '&[data-last-week]': {
+  '&[data-bottom-edge]': {
     borderBottom: '1px solid #000',
   },
   '&[data-first-column]': {
@@ -521,9 +576,6 @@ export const stylized = () => {
     year: 'numeric',
   });
 
-  const leftDays = useCalendarDayGrid(month, year);
-  const rightDays = useCalendarDayGrid(month + 1, year);
-
   return (
     <>
       <p>
@@ -541,17 +593,17 @@ export const stylized = () => {
           <div style={{ marginRight: '8px' }}>
             <span>{monthLabel}</span>
             <StylizedGrid>
-              {leftDays.map((value) => (
-                <StylizedDay value={value} key={value.key} />
-              ))}
+              <CalendarDays>
+                {(value) => <StylizedDay value={value} key={value.key} />}
+              </CalendarDays>
             </StylizedGrid>
           </div>
           <div>
             <span>{nextMonthLabel}</span>
             <StylizedGrid>
-              {rightDays.map((value) => (
-                <StylizedDay value={value} key={value.key} />
-              ))}
+              <CalendarDays monthOffset={1}>
+                {(value) => <StylizedDay value={value} key={value.key} />}
+              </CalendarDays>
             </StylizedGrid>
           </div>
         </div>

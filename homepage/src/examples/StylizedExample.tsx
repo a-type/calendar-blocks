@@ -1,7 +1,7 @@
 import { styled } from '@stitches/react';
-import React, { forwardRef, useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
-import { Calendar, CalendarDay, useCalendarDayGrid } from '../../../src';
+import { Calendar, CalendarDay, CalendarDays } from '../../../src';
 import { ExampleProps } from './types';
 
 const now = new Date();
@@ -75,10 +75,10 @@ const StylizedDay = styled(CalendarDay, {
     borderRadius: '100%',
     backgroundColor: '#ecce1f',
   },
-  '&[data-first-week]': {
+  '&[data-top-edge]': {
     borderTop: '1px solid rgba(0,20,80, 0.5)',
   },
-  '&[data-last-week]': {
+  '&[data-bottom-edge]': {
     borderBottom: '1px solid rgba(0,20,80, 0.5)',
   },
   '&[data-first-column]': {
@@ -97,16 +97,16 @@ const StylizedDay = styled(CalendarDay, {
   },
 
   // round the corners!
-  '&[data-first-column][data-last-week]': {
+  '&[data-first-column][data-bottom-edge]': {
     borderBottomLeftRadius: '8px',
   },
-  '&[data-last-column][data-last-week]': {
+  '&[data-last-column][data-bottom-edge]': {
     borderBottomRightRadius: '8px',
   },
-  '&[data-first-column][data-first-week]': {
+  '&[data-first-column][data-top-edge]': {
     borderTopLeftRadius: '8px',
   },
-  '&[data-last-column][data-first-week]': {
+  '&[data-last-column][data-top-edge]': {
     borderTopRightRadius: '8px',
   },
 
@@ -199,9 +199,6 @@ export function StylizedExample({
     year: 'numeric',
   });
 
-  const leftDays = useCalendarDayGrid(month, year);
-  const rightDays = useCalendarDayGrid(month + 1, year);
-
   return (
     <Calendar
       displayMonth={month}
@@ -235,15 +232,15 @@ export function StylizedExample({
         </StylizedMonthLabel>
         <StylizedCalendarGrid css={{ gridArea: 'leftGrid' }}>
           <DayLabels />
-          {leftDays.map((value) => (
-            <StylizedDay value={value} key={value.key} />
-          ))}
+          <CalendarDays>
+            {(value) => <StylizedDay value={value} key={value.key} />}
+          </CalendarDays>
         </StylizedCalendarGrid>
         <StylizedCalendarGrid css={{ gridArea: 'rightGrid' }}>
           <DayLabels />
-          {rightDays.map((value) => (
-            <StylizedDay value={value} key={value.key} />
-          ))}
+          <CalendarDays monthOffset={1}>
+            {(value) => <StylizedDay value={value} key={value.key} />}
+          </CalendarDays>
         </StylizedCalendarGrid>
       </StylizedMonthsLayout>
     </Calendar>

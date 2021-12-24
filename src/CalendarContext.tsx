@@ -1,5 +1,7 @@
 import { createContext, MouseEvent, useContext } from 'react';
 
+import { WeekDay } from './constants';
+
 export interface CalendarContextData {
   setDay: (value: Date) => void;
   setDayHovered: (value: Date) => boolean;
@@ -13,6 +15,7 @@ export interface CalendarContextData {
   };
   getDateEnabled: (value: Date) => boolean;
   isFocusWithin: boolean;
+  weekStartsOn: WeekDay;
 }
 
 export const CalendarContext = createContext<CalendarContextData>({
@@ -23,6 +26,7 @@ export const CalendarContext = createContext<CalendarContextData>({
   year: 0,
   getDateEnabled: () => true,
   isFocusWithin: false,
+  weekStartsOn: WeekDay.Sunday,
 });
 
 export const CalendarContextProvider = CalendarContext.Provider;

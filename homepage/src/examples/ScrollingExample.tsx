@@ -53,7 +53,7 @@ const ScrollingCalendarDay = styled(CalendarDay, {
     opacity: 0.5,
     cursor: 'default',
   },
-  '&[data-first-week]': {
+  '&[data-top-edge]': {
     borderTop: '1px solid rgba(0,20,80, 0.5)',
   },
   '&[data-day-first]:not([data-first-column])': {

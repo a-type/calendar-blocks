@@ -1,7 +1,7 @@
 import { styled } from '@stitches/react';
 import React, { useState } from 'react';
 
-import { Calendar, CalendarDay, useCalendarDayGrid } from '../../../src';
+import { Calendar, CalendarDay, CalendarDays } from '../../../src';
 import { ExampleProps } from './types';
 
 const SimpleCalendar = styled(Calendar, {
@@ -80,7 +80,6 @@ export function SimpleExample({
   rangeValue,
   onRangeValueChange,
 }: ExampleProps) {
-  const days = useCalendarDayGrid(month, year);
   const monthLabel = new Date(year, month).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
@@ -111,9 +110,9 @@ export function SimpleExample({
         onRangeChange={onRangeValueChange}
       >
         <DayLabels />
-        {days.map((value, index) => (
-          <SimpleDay value={value} key={value.key} />
-        ))}
+        <CalendarDays>
+          {(value) => <SimpleDay value={value} key={value.key} />}
+        </CalendarDays>
       </SimpleCalendar>
     </div>
   );

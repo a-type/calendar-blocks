@@ -18,7 +18,9 @@ Let's get off on the right foot - this isn't an out-of-the-box date picker. The 
 So I can show you some 'basic' example code like this, which is mostly state-keeping:
 
 ```tsx
-import { Calendar, CalendarDay, useCalendarDayGrid } from 'calendar-blocks';
+import { Calendar, CalendarDay, CalendarDays } from 'calendar-blocks';
+
+const now = new Date();
 
 const DatePicker = () => {
   // which month / year are we looking at?
@@ -31,8 +33,6 @@ const DatePicker = () => {
   });
   // what date is selected?
   const [value, setValue] = useState<Date | null>(null);
-  // what days should we render? this hook is provided by calendar-blocks
-  const days = useCalendarDayGrid(month, year);
 
   return (
     // the calendar manages selection state and reports changes
@@ -43,9 +43,9 @@ const DatePicker = () => {
       onChange={setValue}
       onDisplayChange={setViewInfo}
     >
-      {days.map((day) => (
-        <CalendarDay value={day} key={date.toISOString()} />
-      ))}
+      <CalendarDays>
+        {(day) => <CalendarDay value={day} key={day.key} />}
+      </CalendarDays>
     </Calendar>
   );
 };
@@ -60,7 +60,7 @@ It's not so hard to make a grid in modern CSS, though. For inspiration, check ou
 - CSS styling of any kind
 - Providing month names or buttons to navigate between months and years (the state is in your domain already, so you can implement this with normal buttons or fancy swipe gestures at your discretion)
 - Providing visual details like day-of-the-week headers (these don't require any logic and are pretty dependent on your layout - but they often fit quite well into an existing CSS grid once you've set it up, see the examples)
-- Internationalization. This one is my bad! I could use some help in implementing things like alternative start-of-week days or even alternative calendars. I recognize these are not at all uncommon needs, but I've been building this mostly to fulfill my own US-centric work.
+- Localization. `Calendar` does allow you to supply a custom week start day - which can be computed for your locale using a module like [weekstart](https://github.com/gamtiq/weekstart). However, this library doesn't support any other kinds of calendars besides Gregorian.
 
 ## Keyboard navigation
 
@@ -98,15 +98,32 @@ Here's a list:
 - `data-last-row`: If this day is in the last row on the calendar grid
 - `data-first-column`: If this day is in the first column on the calendar grid
 - `data-last-column`: If this day is in the last column on the calendar grid
-- `data-first-week`: If this day is in the first week of the month
-- `data-last-week`: If this day is in the last week of the month
+- `data-top-edge`: If this day is in the first 7 days of the month. Days with this attribute all have a 'top edge' in the calendar grid, and you can use the attribute to render them that way.
+- `data-bottom-edge`: If this day is in the last 7 days of the month. Days with this attribute all have a 'bottom edge' in the calendar grid, and you can use the attribute to render them that way.
 - `data-range-start`: If this day is the start of a range selection
 - `data-range-end`: If this day is the end of a range selection
 - `data-in-range`: If this day is in the range selection but not the start or end
 - `data-weekend`: If this day is a weekend
 
-## TODO
+## CalendarDayValue
 
-- [ ] Better docs
-- [ ] Internationalization
-- [ ] Helpers for rendering days which fall outside the current month
+The `CalendarDay` component accepts an object which wraps a native Date and provides some additional details which are needed for rendering. In most cases you don't need to worry about this, just pass a value from `CalendarDays` into the `value` prop of `CalendarDay`.
+
+The contents of the `CalendarDayValue` object are currently:
+
+- `date`: the native Date object
+- `isDifferentMonth`: whether the day is in a different month than the calendar is currently displaying
+
+The value supplied by `CalendarDays` (or `useCalendarDayList`) also has a `key` property which you can use for a convenient React key value while iterating.
+
+## Other tools: hooks, utilities, etc
+
+This library exposes some of its internal logic so you can get even more customized.
+
+The main example of this is `useCalendarDayList`, which is a hook that replicates the functionality of the `CalendarDays` component. With this hook you can skip using that component and directly get a list of days which would appear in a square calendar grid for the given month.
+
+There's also `useCalendarDay`, which reads a parent Calendar context and returns the [`CalendarDayValue`](#CalendarDayValue) which can be passed to a `CalendarDay` component. This can help you build custom iteration of days within a Calendar, which is especially useful for infinite windowed lists.
+
+Finally, all of the utility helpers used to determine where dates are rendered with a grid, if days are equal, if a day falls within a range, etc are also exported for your convenience if you should need them for customized behaviors.
+
+For full details, see the [TypeDoc](https://a-type.github.io/calendar-blocks/lib)

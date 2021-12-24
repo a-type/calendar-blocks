@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import { getMonthWeekdayOffset, useCalendarContext } from '.';
+import { WeekDay } from './constants';
 
 /**
  * Given an enclosing Calendar context, this
@@ -8,9 +9,12 @@ import { getMonthWeekdayOffset, useCalendarContext } from '.';
  * have a row and column, compute the index as
  * row * 7 + column.
  */
-export function useCalendarDay(dayIndex: number) {
+export function useCalendarDay(
+  dayIndex: number,
+  weekStartsOn = WeekDay.Sunday
+) {
   const { month, year } = useCalendarContext();
-  const weekdayOffset = getMonthWeekdayOffset(month, year);
+  const weekdayOffset = getMonthWeekdayOffset(month, year, weekStartsOn);
   const day = dayIndex - weekdayOffset + 1;
   const date = new Date(year, month, day);
   return useMemo(

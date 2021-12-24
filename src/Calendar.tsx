@@ -1,6 +1,7 @@
 import React, { FC, FocusEvent, forwardRef, HTMLAttributes, memo, MouseEvent, useCallback, useMemo } from 'react';
 
 import { CalendarContextData, CalendarContextProvider } from './CalendarContext';
+import { WeekDay } from './constants';
 import { today } from './dateUtils';
 import { isEventTargetDay } from './eventUtils';
 import useCalendarSelection from './useCalendarSelection';
@@ -56,6 +57,10 @@ export type CalendarProps = Omit<
    * and becomes focused. Defaults to today.
    */
   defaultDate?: Date;
+  /**
+   * You can override the locale default week start day
+   */
+  weekStartsOn?: WeekDay;
 };
 
 const noop = () => {};
@@ -82,6 +87,7 @@ export const Calendar = forwardRef<any, CalendarProps>(
       defaultDate = today,
       onFocus,
       onBlur,
+      weekStartsOn = WeekDay.Sunday,
       ...restProps
     },
     ref
@@ -120,6 +126,7 @@ export const Calendar = forwardRef<any, CalendarProps>(
         rangeValue,
         getDateEnabled,
         isFocusWithin,
+        weekStartsOn,
       }),
       [
         highlightedDate,
@@ -135,6 +142,7 @@ export const Calendar = forwardRef<any, CalendarProps>(
         value,
         getDateEnabled,
         isFocusWithin,
+        weekStartsOn,
       ]
     );
 

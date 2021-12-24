@@ -1,7 +1,7 @@
 import { styled } from '@stitches/react';
 import React, { useCallback, useState } from 'react';
 
-import { Calendar, CalendarDay, useCalendarDayGrid } from '../../../src';
+import { Calendar, CalendarDay, CalendarDays } from '../../../src';
 import { ExampleProps } from './types';
 
 const DetailedCalendar = styled(Calendar, {
@@ -107,7 +107,6 @@ export function DetailedExample({
   rangeValue,
   onRangeValueChange,
 }: ExampleProps) {
-  const days = useCalendarDayGrid(month, year);
   const monthLabel = new Date(year, month).toLocaleDateString('en-US', {
     month: 'long',
     year: 'numeric',
@@ -141,11 +140,13 @@ export function DetailedExample({
         getDateEnabled={getDateEnabled}
       >
         <DayLabels />
-        {days.map((value) => (
-          <DetailedDay value={value} key={value.key}>
-            <DetailedDayContents value={value.date} />
-          </DetailedDay>
-        ))}
+        <CalendarDays>
+          {(value) => (
+            <DetailedDay value={value} key={value.key}>
+              <DetailedDayContents value={value.date} />
+            </DetailedDay>
+          )}
+        </CalendarDays>
       </DetailedCalendar>
     </div>
   );

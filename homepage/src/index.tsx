@@ -142,7 +142,7 @@ const ExamplesGrid = styled('div', {
   alignItems: 'center',
   justifyContent: 'center',
 
-  '@media (min-width: 768px)': {
+  '@media (min-width: 900px)': {
     gridTemplateColumns: '1fr 1fr',
   },
 });

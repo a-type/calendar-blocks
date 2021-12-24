@@ -15,10 +15,14 @@ import {
 } from './dateUtils';
 import useCombinedRef from './useCombinedRef';
 
+export interface CalendarDayValue {
+  date: Date;
+  isDifferentMonth?: boolean;
+}
 export interface CalendarDayProps
   extends Omit<HTMLAttributes<HTMLButtonElement>, 'value' | 'onClick'> {
   /** the day this calendar day box represents */
-  value: { date: Date; isDifferentMonth?: boolean };
+  value: CalendarDayValue;
   /** called when the user clicks the day box */
   onClick?: (ev: MouseEvent<HTMLButtonElement>, value: Date) => any;
   disabled?: boolean;
@@ -32,6 +36,7 @@ const useDayProps = (value: Date, isDifferentMonth: boolean) => {
     rangeValue,
     isFocusWithin,
     getDateEnabled,
+    weekStartsOn,
   } = useCalendarContext();
 
   const attributes = {
@@ -57,17 +62,17 @@ const useDayProps = (value: Date, isDifferentMonth: boolean) => {
     if (isSameDay(value, lastDay)) {
       attributes['data-day-last'] = true;
     }
-    if (getIsFirstRow(value)) {
+    if (getIsFirstRow(value, weekStartsOn)) {
       attributes['data-first-row'] = true;
     }
-    if (getIsLastRow(value)) {
+    if (getIsLastRow(value, weekStartsOn)) {
       attributes['data-last-row'] = true;
     }
     if (getIsFirstWeek(value)) {
-      attributes['data-first-week'] = true;
+      attributes['data-top-edge'] = true;
     }
     if (getIsLastWeek(value)) {
-      attributes['data-last-week'] = true;
+      attributes['data-bottom-edge'] = true;
     }
     if (value.getDay() === 0) {
       attributes['data-first-column'] = true;

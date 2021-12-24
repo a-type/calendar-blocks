@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 
-import { getMonthDayGrid } from './getMonthDayGrid';
+import { CalendarDayValue } from './CalendarDay';
+import { WeekDay } from './constants';
+import { getMonthDayList } from './getMonthDayList';
 
 /**
  * A helper hook which computes a list of 'days' and 'blanks' which will render
@@ -8,9 +10,16 @@ import { getMonthDayGrid } from './getMonthDayGrid';
  * which don't have a day in them (like if a month starts on Tuesday, Sunday and
  * Monday will be blank). Other values will be Dates.
  */
-export function useCalendarDayGrid(month: number, year: number) {
+export function useCalendarDayList(
+  month: number,
+  year: number,
+  dayStartsOn = WeekDay.Sunday
+): (CalendarDayValue & { key: string })[] {
   // this is memoized to provide consistent references
-  const dayGrid = useMemo(() => getMonthDayGrid(month, year), [month, year]);
+  const dayGrid = useMemo(
+    () => getMonthDayList(month, year, dayStartsOn),
+    [month, year]
+  );
 
   return dayGrid;
 }
