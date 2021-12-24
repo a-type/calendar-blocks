@@ -87,7 +87,8 @@ Here's a list:
 - `data-selected`: whether the day is selected
 - `data-highlighted`: whether the user is highlighting the day (via focus or hover)
 - `data-highlighted-inactive`: when the calendar doesn't have focus, this attribute is applied to the highlighted day instead of `data-highlighted`. It's best not to visually highlight the day while focus is not within the calendar, but you can still use this attribute to style it in a way that bookmarks where the 'cursor' is while the user is interacting elsewhere.
-- `data-disabled`: if the day doesn't match true from your supplied `getDateEnabled` function, this attribute is applied to the day.
+- `data-disabled`: if the day doesn't match true from your supplied `getDateEnabled` function or if the `disabled` prop is true on the CalendarDay, this attribute is applied to the day.
+- `data-invalid-hover`: if the user hovers a day which they cannot select as part of a range, this attribute is applied to the day. This happens when a range would include disabled days.
 - `data-today`: whether the day is today
 - `data-date-number`: The visual date number (1-31)
 - `data-day-number`: The day of the week as an index (0-6)

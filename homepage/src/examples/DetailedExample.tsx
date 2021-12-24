@@ -48,7 +48,7 @@ const DetailedDay = styled(CalendarDay, {
     backgroundColor: '#f5f5f5',
   },
 
-  '&[data-invalid-hover]': {
+  '&[data-invalid-hover], &[data-disabled]:hover': {
     cursor: 'not-allowed',
   },
 

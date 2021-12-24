@@ -63,6 +63,8 @@ export default ({
     }
   }, [conflictingValues]);
 
+  // TODO: selected/hovered often get set at the same time. convert this to a
+  // more sensible state machine
   const [selectedDate, setSelectedDate] = useState(
     (rangeValue && rangeValue.end) || value
   );
@@ -155,9 +157,13 @@ export default ({
       selectedDate?.getMonth() !== month ||
       selectedDate?.getFullYear() !== year
     ) {
-      setSelectedDate(
-        new Date(year, month, wentBackwards ? getDaysInMonth(month, year) : 1)
+      const movedDate = new Date(
+        year,
+        month,
+        wentBackwards ? getDaysInMonth(month, year) : 1
       );
+      setSelectedDate(movedDate);
+      setHoveredDate(movedDate);
     }
     previousMonthAndYear.current = { month, year };
   }, [month, year, previousMonthAndYear]);

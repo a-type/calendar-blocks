@@ -23,8 +23,12 @@ export interface CalendarDayProps
   extends Omit<HTMLAttributes<HTMLButtonElement>, 'value' | 'onClick'> {
   /** the day this calendar day box represents */
   value: CalendarDayValue;
-  /** called when the user clicks the day box */
-  onClick?: (ev: MouseEvent<HTMLButtonElement>, value: Date) => any;
+  /** called when the user clicks the day box - even if the date is not allowed to be selected */
+  onClick?: (
+    ev: MouseEvent<HTMLButtonElement>,
+    value: Date,
+    isDisabled: boolean
+  ) => any;
   disabled?: boolean;
 }
 
@@ -35,7 +39,6 @@ const useDayProps = (value: Date, isDifferentMonth: boolean) => {
     highlightedDate,
     rangeValue,
     isFocusWithin,
-    getDateEnabled,
     weekStartsOn,
   } = useCalendarContext();
 
@@ -83,10 +86,6 @@ const useDayProps = (value: Date, isDifferentMonth: boolean) => {
     if (isSameDay(value, new Date())) {
       attributes['data-today'] = true;
     }
-  }
-  if (!getDateEnabled(value)) {
-    attributes['data-disabled'] = true;
-    attributes['aria-disabled'] = true;
   }
   if (getIsWeekend(value)) {
     attributes['data-weekend'] = true;
@@ -141,7 +140,7 @@ export const CalendarDay = forwardRef<HTMLButtonElement, CalendarDayProps>(
       onMouseLeave,
       value: { date, isDifferentMonth = false },
       children,
-      disabled = isDifferentMonth,
+      disabled: userDisabled = false,
       ...restProps
     },
     ref
@@ -154,12 +153,17 @@ export const CalendarDay = forwardRef<HTMLButtonElement, CalendarDayProps>(
       highlightedDate,
     } = useCalendarContext();
 
+    const disabled = !getDateEnabled(date);
+    const cannotBeSelected = disabled || userDisabled;
+
     const highlighted = isSameDay(date, highlightedDate);
 
     const handleClick = useCallback(
       (ev: MouseEvent<HTMLButtonElement>) => {
-        setDay(date);
-        onClick?.(ev, date);
+        if (!cannotBeSelected) {
+          setDay(date);
+        }
+        onClick?.(ev, date, cannotBeSelected);
       },
       [date, onClick, setDay]
     );
@@ -194,6 +198,8 @@ export const CalendarDay = forwardRef<HTMLButtonElement, CalendarDayProps>(
       }
     }, [shouldAutoFocus]);
 
+    const extraProps = cannotBeSelected ? { ['data-disabled']: true } : {};
+
     return (
       <button
         ref={combinedRef as any}
@@ -201,7 +207,7 @@ export const CalendarDay = forwardRef<HTMLButtonElement, CalendarDayProps>(
         onMouseEnter={handleHover}
         onMouseLeave={handleUnhover}
         tabIndex={highlighted ? 0 : -1}
-        disabled={!getDateEnabled(date) || disabled}
+        {...extraProps}
         {...dayProps}
         {...restProps}
       >
