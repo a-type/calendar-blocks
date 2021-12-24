@@ -1,12 +1,11 @@
 {
   "name": "library-homepage",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build index.html",
-    "build:gh": "parcel build index.html --public-url /react-typescript-library-template/ --dist-dir ../docs"
+    "build:gh": "parcel build index.html --public-url /calendar-blocks/ --dist-dir ../docs"
   },
   "dependencies": {
     "@stitches/react": "^1.2.6",
