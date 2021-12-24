@@ -1,6 +1,7 @@
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 
-import { addMonths, defaultGetDateEnabled, getDaysInMonth, isBefore, today } from './dateUtils';
+import { addMonths, getDaysInMonth, isBefore, rangeIncludesInvalidDate, today } from './dateUtils';
+import { isEventTargetDay } from './eventUtils';
 
 type UseCalendarSelectionArgs = {
   /** The selected month of the calendar */
@@ -25,6 +26,8 @@ type UseCalendarSelectionArgs = {
   defaultDate?: Date;
 };
 
+const getDateEnabledIsTrue = () => true;
+
 /**
  * Manages selection and focus state for the calendar grid control.
  *
@@ -43,29 +46,36 @@ export default ({
   onRangeChange,
   month,
   year,
-  getDateEnabled = defaultGetDateEnabled,
+  getDateEnabled = getDateEnabledIsTrue,
   defaultDate = today,
   ...rest
 }: UseCalendarSelectionArgs) => {
   if (!!rangeValue && !onRangeChange) {
     throw new Error('onRangeChange must be supplied if rangeValue is supplied');
   }
-  if (!!rangeValue && value && process.env.NODE_ENV !== 'production') {
-    console.warn(
-      'You provided a value to useCalendarSelection in addition to a rangeValue. The value will be ignored in favor of the rangeValue. Remove value to avoid this warning.'
-    );
-  }
+  const conflictingValues =
+    !!rangeValue && value && process.env.NODE_ENV !== 'production';
+  useEffect(() => {
+    if (conflictingValues) {
+      console.warn(
+        'You provided a value to useCalendarSelection in addition to a rangeValue. The value will be ignored in favor of the rangeValue. Remove value to avoid this warning.'
+      );
+    }
+  }, [conflictingValues]);
 
   const [selectedDate, setSelectedDate] = useState(
     (rangeValue && rangeValue.end) || value
   );
-  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(defaultDate);
   const highlightedDate = hoveredDate || selectedDate;
 
   const [pendingRangeStart, setPendingRangeStart] = useState<Date | null>(null);
+  const isSelectingRange = !!pendingRangeStart;
 
   const handleKeyDown = useCallback(
     (ev: KeyboardEvent) => {
+      if (!isEventTargetDay(ev)) return;
+
       const currentDate = highlightedDate || defaultDate;
       let newDate = new Date(currentDate);
       if (ev.key === 'ArrowLeft') {
@@ -98,7 +108,14 @@ export default ({
 
       ev.preventDefault();
 
-      if (getDateEnabled(newDate)) {
+      // to preserve the validity of range selections,
+      // prevent encompassing a disabled date in a range
+      if (
+        !(
+          pendingRangeStart &&
+          rangeIncludesInvalidDate(pendingRangeStart, newDate, getDateEnabled)
+        )
+      ) {
         setSelectedDate(newDate);
         setHoveredDate(null);
         if (
@@ -113,15 +130,19 @@ export default ({
         }
       }
     },
-    [highlightedDate, setSelectedDate, onMonthChange, getDateEnabled]
+    [
+      highlightedDate,
+      setSelectedDate,
+      onMonthChange,
+      pendingRangeStart,
+      getDateEnabled,
+    ]
   );
 
   const previousMonthAndYear = useRef({ month, year });
   useEffect(() => {
-    const {
-      month: previousMonth,
-      year: previousYear,
-    } = previousMonthAndYear.current;
+    const { month: previousMonth, year: previousYear } =
+      previousMonthAndYear.current;
 
     // didn't actually change
     if (previousMonth === month && previousYear === year) {
@@ -143,7 +164,10 @@ export default ({
 
   const handleDaySelect = useCallback(
     (value: Date) => {
-      if (!getDateEnabled(value)) {
+      if (
+        isSelectingRange &&
+        rangeIncludesInvalidDate(pendingRangeStart, value, getDateEnabled)
+      ) {
         return;
       }
 
@@ -161,7 +185,7 @@ export default ({
           setPendingRangeStart(null);
 
           // for range operations, we 'normalize' the selected values
-          // to determine which one is earler, then inform the user of
+          // to determine which one is earlier, then inform the user of
           // the dates in the correct order
 
           if (isBefore(value, pendingRangeStart)) {
@@ -185,14 +209,26 @@ export default ({
       setSelectedDate,
       onRangeChange,
       getDateEnabled,
+      isSelectingRange,
     ]
   );
 
   const handleDayHover = useCallback(
     (value: Date) => {
+      // to prevent invalid range selection,
+      // don't allow hovering a range end
+      // if the range would include disabled dates
+      if (
+        isSelectingRange &&
+        rangeIncludesInvalidDate(pendingRangeStart, value, getDateEnabled)
+      ) {
+        return false;
+      }
+
       setHoveredDate(value);
+      return true;
     },
-    [setHoveredDate]
+    [setHoveredDate, isSelectingRange, pendingRangeStart, getDateEnabled]
   );
 
   return {

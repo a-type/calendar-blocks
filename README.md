@@ -1,4 +1,8 @@
-# calendar-blocks
+# 🗓🧱 calendar-blocks
+
+```
+yarn add calendar-blocks
+```
 
 Flexible, customizable React calendar / date-picker primitives.
 
@@ -11,9 +15,11 @@ Flexible, customizable React calendar / date-picker primitives.
 
 Let's get off on the right foot - this isn't an out-of-the-box date picker. The functionality works with very little code, but it won't look pretty! On the flip side, since there's few assumptions about rendering, you've got full control. You don't even have to make it a grid if you don't want to.
 
-So I can show you some 'basic' example code like this:
+So I can show you some 'basic' example code like this, which is mostly state-keeping:
 
 ```tsx
+import { Calendar, CalendarDay, useCalendarDayGrid } from 'calendar-blocks';
+
 const DatePicker = () => {
   // which month / year are we looking at?
   const [{ month, year }, setViewInfo] = useState<{
@@ -25,7 +31,7 @@ const DatePicker = () => {
   });
   // what date is selected?
   const [value, setValue] = useState<Date | null>(null);
-  // what days should we render?
+  // what days should we render? this hook is provided by calendar-blocks
   const days = useCalendarDayGrid(month, year);
 
   return (
@@ -37,14 +43,9 @@ const DatePicker = () => {
       onChange={setValue}
       onDisplayChange={setViewInfo}
     >
-      {/* we render the days ourselves, some will be null (see docs) */}
-      {days.map((date) =>
-        date ? (
-          <StyledDay value={date} key={date.toISOString()} />
-        ) : (
-          <CalendarEmptyDay />
-        )
-      )}
+      {days.map((day) => (
+        <CalendarDay value={day} key={date.toISOString()} />
+      ))}
     </Calendar>
   );
 };
@@ -52,7 +53,20 @@ const DatePicker = () => {
 
 But you should know this won't look like a calendar. It'll just be a list of buttons for each day in the month!
 
-But it's also not hard to make a grid in modern CSS. For inspiration, check out the Storybook examples.
+It's not so hard to make a grid in modern CSS, though. For inspiration, check out the [examples directory](https://github.com/a-type/calendar-blocks/tree/main/homepage/src/examples) and [Storybook examples.](https://a-type.github.io/calendar-blocks/storybook) `calendar-blocks` is flexible enough to accomplish many layouts, including virtualized grids!
+
+### Other things `calendar-blocks` doesn't do
+
+- CSS styling of any kind
+- Providing month names or buttons to navigate between months and years (the state is in your domain already, so you can implement this with normal buttons or fancy swipe gestures at your discretion)
+- Providing visual details like day-of-the-week headers (these don't require any logic and are pretty dependent on your layout - but they often fit quite well into an existing CSS grid once you've set it up, see the examples)
+- Internationalization. This one is my bad! I could use some help in implementing things like alternative start-of-week days or even alternative calendars. I recognize these are not at all uncommon needs, but I've been building this mostly to fulfill my own US-centric work.
+
+## Keyboard navigation
+
+One of the primary features of `calendar-blocks` is providing keyboard navigation and selection bindings seamlessly for you. Render `CalendarDay` components within a `Calendar`, and the user can move between them with their keyboard. This includes sensible 2-d navigation, using Home and End for week navigation, and Page Up and Page Down for month navigation. It also automatically invokes changes to the `displayMonth` and `displayYear` when the user moves across month boundaries.
+
+You can disable days, and selection will respect this. Users can still navigate along disabled days, but cannot select them. Range selection will prevent the user from selecting a range which includes a disabled day.
 
 ## Display state vs. selection state
 
@@ -68,13 +82,16 @@ Here's a list:
 
 - `data-selected`: whether the day is selected
 - `data-highlighted`: whether the user is highlighting the day (via focus or hover)
+- `data-highlighted-inactive`: when the calendar doesn't have focus, this attribute is applied to the highlighted day instead of `data-highlighted`. It's best not to visually highlight the day while focus is not within the calendar, but you can still use this attribute to style it in a way that bookmarks where the 'cursor' is while the user is interacting elsewhere.
+- `data-disabled`: if the day doesn't match true from your supplied `getDateEnabled` function, this attribute is applied to the day.
 - `data-today`: whether the day is today
 - `data-date-number`: The visual date number (1-31)
 - `data-day-number`: The day of the week as an index (0-6)
 - `data-day-first`: If this is the first day of the month
 - `data-day-last`: If this is the last day of the month
-- `data-top-row`: If this day is in the first row on the calendar grid
-- `data-bottom-row`: If this day is in the last row on the calendar grid
+- `data-different-month`: If a CalendarDay is rendered within a Calendar but its `displayMonth` and `displayYear` don't match the Calendar's `displayMonth` and `displayYear`, it will have this attribute. This occurs for days in the week prior to the first day of the month, for example - if a month starts on a Wednesday, it will be preceded by 3 days from the previous month. To hide these days, use a CSS rule which adds `visibility: hidden` to days with this attribute.
+- `data-first-row`: If this day is in the first row on the calendar grid
+- `data-last-row`: If this day is in the last row on the calendar grid
 - `data-first-column`: If this day is in the first column on the calendar grid
 - `data-last-column`: If this day is in the last column on the calendar grid
 - `data-first-week`: If this day is in the first week of the month

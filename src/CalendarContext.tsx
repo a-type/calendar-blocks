@@ -1,10 +1,8 @@
 import { createContext, MouseEvent, useContext } from 'react';
 
 export interface CalendarContextData {
-  onDayClick: (ev: MouseEvent<any>, value: Date) => void;
   setDay: (value: Date) => void;
-  setDayHovered: (value: Date) => void;
-  onDayHover: (ev: MouseEvent<any>, value: Date) => void;
+  setDayHovered: (value: Date) => boolean;
   highlightedDate: Date | null;
   month: number;
   year: number;
@@ -14,17 +12,17 @@ export interface CalendarContextData {
     end: Date | null;
   };
   getDateEnabled: (value: Date) => boolean;
+  isFocusWithin: boolean;
 }
 
 export const CalendarContext = createContext<CalendarContextData>({
-  onDayClick: () => {},
   setDay: () => {},
-  setDayHovered: () => {},
-  onDayHover: () => {},
+  setDayHovered: () => true,
   highlightedDate: null,
   month: 0,
   year: 0,
   getDateEnabled: () => true,
+  isFocusWithin: false,
 });
 
 export const CalendarContextProvider = CalendarContext.Provider;

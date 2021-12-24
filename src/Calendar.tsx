@@ -1,7 +1,8 @@
 import React, { FC, FocusEvent, forwardRef, HTMLAttributes, memo, MouseEvent, useCallback, useMemo } from 'react';
 
 import { CalendarContextData, CalendarContextProvider } from './CalendarContext';
-import { defaultGetDateEnabled, today } from './dateUtils';
+import { today } from './dateUtils';
+import { isEventTargetDay } from './eventUtils';
 import useCalendarSelection from './useCalendarSelection';
 
 export type CalendarProps = Omit<
@@ -11,7 +12,7 @@ export type CalendarProps = Omit<
   /**
    * Called when the month / year of the calendar view is changed by the user
    */
-  onDisplayChange: (newValue: { month: number; year: number }) => any;
+  onDisplayChange?: (newValue: { month: number; year: number }) => any;
   /**
    * The year to display in the calendar view
    */
@@ -57,6 +58,9 @@ export type CalendarProps = Omit<
   defaultDate?: Date;
 };
 
+const noop = () => {};
+const defaultGetDateEnabled = () => true;
+
 /**
  * An all-purpose Calendar primitive which manages day selection and various useful event callbacks.
  * Rendering is up to you; this component doesn't render any days or interactive elements - just a div
@@ -70,12 +74,14 @@ export const Calendar = forwardRef<any, CalendarProps>(
       onChange,
       displayMonth: month,
       displayYear: year,
-      onDisplayChange: onMonthChange,
+      onDisplayChange: onMonthChange = noop,
       rangeValue: providedRangeValue,
       onRangeChange,
       onRangeStartChange,
       getDateEnabled = defaultGetDateEnabled,
       defaultDate = today,
+      onFocus,
+      onBlur,
       ...restProps
     },
     ref
@@ -101,25 +107,11 @@ export const Calendar = forwardRef<any, CalendarProps>(
       defaultDate,
     });
 
-    const handleDayClick = useCallback(
-      (_ev: any, value: Date) => {
-        onDaySelect(value);
-      },
-      [onDaySelect]
-    );
-
-    const handleDayHover = useCallback(
-      (_ev: any, value: Date) => {
-        onDayHover(value);
-      },
-      [onDayHover]
-    );
+    const [isFocusWithin, setIsFocusWithin] = React.useState(false);
 
     const context = useMemo<CalendarContextData>(
       () => ({
-        onDayClick: handleDayClick,
         setDay: onDaySelect,
-        onDayHover: handleDayHover,
         setDayHovered: onDayHover,
         highlightedDate,
         month,
@@ -127,10 +119,9 @@ export const Calendar = forwardRef<any, CalendarProps>(
         value,
         rangeValue,
         getDateEnabled,
+        isFocusWithin,
       }),
       [
-        handleDayClick,
-        handleDayHover,
         highlightedDate,
         month,
         onDayHover,
@@ -143,24 +134,26 @@ export const Calendar = forwardRef<any, CalendarProps>(
         year,
         value,
         getDateEnabled,
+        isFocusWithin,
       ]
     );
 
-    const noValueHighlighted = !highlightedDate;
-
     const handleRootFocus = useCallback(
-      (ev: FocusEvent) => {
-        // only if the root itself was the target of the focus event
-        if (ev.target === ev.currentTarget) {
-          if (!getDateEnabled(defaultDate)) {
-            console.warn(
-              'Violation: the defaultDate value is not an enabled date. This breaks selection logic!'
-            );
-          }
-          setHighlightedDate(defaultDate);
+      (ev: FocusEvent<HTMLDivElement>) => {
+        // if a day element was focused, update context
+        if (isEventTargetDay(ev)) {
+          setIsFocusWithin(true);
         }
+        onFocus?.(ev);
       },
-      [defaultDate, setHighlightedDate, getDateEnabled]
+      [onFocus]
+    );
+    const handleRootBlur = useCallback(
+      (ev: FocusEvent<HTMLDivElement>) => {
+        setIsFocusWithin(false);
+        onBlur?.(ev);
+      },
+      [onBlur]
     );
 
     return (
@@ -168,8 +161,8 @@ export const Calendar = forwardRef<any, CalendarProps>(
         <div
           {...restProps}
           {...props}
-          tabIndex={noValueHighlighted ? 0 : -1}
           onFocus={handleRootFocus}
+          onBlur={handleRootBlur}
           ref={ref}
         />
       </CalendarContextProvider>

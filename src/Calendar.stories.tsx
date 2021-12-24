@@ -3,7 +3,6 @@ import React, { useCallback, useState } from 'react';
 
 import { Calendar } from './Calendar';
 import { CalendarDay } from './CalendarDay';
-import { CalendarEmptyDay } from './CalendarEmptyDay';
 import { useCalendarDayGrid } from './useCalendarDayGrid';
 
 export default {
@@ -40,6 +39,9 @@ const StyledDay = styled(CalendarDay, {
   '&:disabled': {
     opacity: 0.5,
     cursor: 'default',
+  },
+  '&[data-different-month]': {
+    visibility: 'hidden',
   },
 });
 
@@ -97,13 +99,9 @@ export const simple = () => {
           onDisplayChange={setViewInfo}
         >
           <StyledGrid>
-            {days.map((date) =>
-              date ? (
-                <StyledDay value={date} key={date.toISOString()} />
-              ) : (
-                <CalendarEmptyDay />
-              )
-            )}
+            {days.map((value) => (
+              <StyledDay value={value} key={value.key} />
+            ))}
           </StyledGrid>
         </Calendar>
       </div>
@@ -159,13 +157,9 @@ export const range = () => {
           onRangeChange={setRangeValue}
         >
           <StyledGrid>
-            {days.map((date) =>
-              date ? (
-                <StyledDay value={date} key={date.toISOString()} />
-              ) : (
-                <CalendarEmptyDay />
-              )
-            )}
+            {days.map((value) => (
+              <StyledDay value={value} key={value.key} />
+            ))}
           </StyledGrid>
         </Calendar>
       </div>
@@ -237,13 +231,9 @@ export const dayLabels = () => {
                 {day}
               </div>
             ))}
-            {days.map((date) =>
-              date ? (
-                <StyledDay value={date} key={date.toISOString()} />
-              ) : (
-                <CalendarEmptyDay />
-              )
-            )}
+            {days.map((value) => (
+              <StyledDay value={value} key={value.key} />
+            ))}
           </StyledGrid>
         </Calendar>
       </div>
@@ -332,13 +322,9 @@ export const wideRange = () => {
               <span style={{ margin: '0 auto 0 auto' }}>{monthLabel}</span>
             </div>
             <StyledGrid>
-              {leftDays.map((date) =>
-                date ? (
-                  <StyledDay value={date} key={date.toISOString()} />
-                ) : (
-                  <CalendarEmptyDay />
-                )
-              )}
+              {leftDays.map((value) => (
+                <StyledDay value={value} key={value.key} />
+              ))}
             </StyledGrid>
           </div>
           <div>
@@ -353,13 +339,9 @@ export const wideRange = () => {
               </button>
             </div>
             <StyledGrid>
-              {rightDays.map((date) =>
-                date ? (
-                  <StyledDay value={date} key={date.toISOString()} />
-                ) : (
-                  <CalendarEmptyDay />
-                )
-              )}
+              {rightDays.map((value) => (
+                <StyledDay value={value} key={value.key} />
+              ))}
             </StyledGrid>
           </div>
         </div>
@@ -409,13 +391,9 @@ export const disabledDays = () => {
           getDateEnabled={getDateEnabled}
         >
           <StyledGrid>
-            {days.map((date) =>
-              date ? (
-                <StyledDay value={date} key={date.toISOString()} />
-              ) : (
-                <CalendarEmptyDay />
-              )
-            )}
+            {days.map((value) => (
+              <StyledDay value={value} key={value.key} />
+            ))}
           </StyledGrid>
         </Calendar>
       </div>
@@ -493,16 +471,6 @@ const StylizedDay = styled(StyledDay, {
   },
 });
 
-const StylizedDayEmpty = styled(CalendarEmptyDay, {
-  background: `repeating-linear-gradient(
-    45deg,
-    #fff,
-    #fff 1px,
-    #eee 2px,
-    #eee 4px
-  )`,
-});
-
 export const stylized = () => {
   const [{ month, year }, setViewInfo] = useState<{
     month: number;
@@ -573,25 +541,17 @@ export const stylized = () => {
           <div style={{ marginRight: '8px' }}>
             <span>{monthLabel}</span>
             <StylizedGrid>
-              {leftDays.map((date) =>
-                date ? (
-                  <StylizedDay value={date} key={date.toISOString()} />
-                ) : (
-                  <StylizedDayEmpty />
-                )
-              )}
+              {leftDays.map((value) => (
+                <StylizedDay value={value} key={value.key} />
+              ))}
             </StylizedGrid>
           </div>
           <div>
             <span>{nextMonthLabel}</span>
             <StylizedGrid>
-              {rightDays.map((date) =>
-                date ? (
-                  <StylizedDay value={date} key={date.toISOString()} />
-                ) : (
-                  <StylizedDayEmpty />
-                )
-              )}
+              {rightDays.map((value) => (
+                <StylizedDay value={value} key={value.key} />
+              ))}
             </StylizedGrid>
           </div>
         </div>
