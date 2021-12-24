@@ -6,7 +6,7 @@
   "scripts": {
     "start": "parcel index.html",
     "build": "parcel build index.html",
-    "build:gh": "parcel build index.html --public-url /react-typescript-library-template/ --out-dir ../docs"
+    "build:gh": "parcel build index.html --public-url /react-typescript-library-template/ --dist-dir ../docs"
   },
   "dependencies": {
     "@stitches/react": "^1.2.6",
