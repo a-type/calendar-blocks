@@ -74,6 +74,10 @@ This library separates state into 'display' and 'selection.' Display state is wh
 
 There's not a whole lot to it though. Display state is `month` and `year` - and selection state is `value`. Those are the 3 values you need to track.
 
+## How keyboard navigation works
+
+I used the 'roving tab' method to implement keyboard interaction with the calendar. The calendar assigns `tabIndex=0` to the 'highlighted' day, and `-1` to all other days. The user can then use the arrow keys to move between days, and the calendar will update the highlighted day. Only the highlighted day is keyboard-focusable, and when the user tabs back to the calendar their focus will return to the last highlighted day.
+
 ## Day element attributes
 
 The `CalendarDay` component applies all kinds of data attributes to the rendered button, so you can do some heavy style customization.
